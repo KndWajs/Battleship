@@ -21,4 +21,11 @@ public class Ship {
         this.column = column;
         this.horizontal = horizontal;
     }
+
+    public int getConstantCoordinate(){
+        return horizontal ? row : column;
+    }
+    public int getVariableCoordinate(){
+        return horizontal ? column : row;
+    }
 }

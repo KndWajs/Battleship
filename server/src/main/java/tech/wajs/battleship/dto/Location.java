@@ -13,9 +13,9 @@ public class Location {
     @Setter
     private Ship ship;
     @Setter
-    private LocationStatus type;
+    private LocationStatus status;
 
     public Location() {
-        this.type = LocationStatus.EMPTY;
+        this.status = LocationStatus.EMPTY;
     }
 }

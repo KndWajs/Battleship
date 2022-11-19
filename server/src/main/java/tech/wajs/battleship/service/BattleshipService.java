@@ -50,24 +50,21 @@ public class BattleshipService {
 
     private Ship getRandomPosition(ShipType shipType) {
         boolean isHorizontal = new Random().nextBoolean();
-        int columns = isHorizontal ? BattleshipSettings.GRID_COLUMNS - shipType.length :
+        int availableRows = isHorizontal ? BattleshipSettings.GRID_ROWS :
+                BattleshipSettings.GRID_ROWS - shipType.length;
+        int availableColumns = isHorizontal ? BattleshipSettings.GRID_COLUMNS - shipType.length :
                 BattleshipSettings.GRID_COLUMNS;
-        int rows = isHorizontal ? BattleshipSettings.GRID_ROWS : BattleshipSettings.GRID_ROWS - shipType.length;
 
-        int column = new Random().nextInt(columns);
-        int row = new Random().nextInt(rows);
+        int randomRow = new Random().nextInt(availableRows);
+        int randomColumn = new Random().nextInt(availableColumns);
 
-        return new Ship(shipType, row, column, isHorizontal);
+        return new Ship(shipType, randomRow, randomColumn, isHorizontal);
     }
 
     private boolean checkIfLocationIsEmpty(Grid grid, Ship ship) {
-        int x = ship.isHorizontal() ? ship.getRow() : ship.getColumn();
-        int y = ship.isHorizontal() ? ship.getColumn() : ship.getRow();
-        BiFunction<Integer, Integer, Location> getLocation = ship.isHorizontal() ?
-                grid::getLocation : (row, column) -> grid.getLocation(column, row);
-
-        for (int alongShipCoordinate = y; alongShipCoordinate < y + ship.getType().length; alongShipCoordinate++) {
-            if (!LocationStatus.EMPTY.equals(getLocation.apply(x, alongShipCoordinate).getType())) {
+        for (int x = ship.getVariableCoordinate(); x < ship.getVariableCoordinate() + ship.getType().length; x++) {
+            LocationStatus status = getLocationForShip(grid, ship).apply(ship.getConstantCoordinate(), x).getStatus();
+            if (!LocationStatus.EMPTY.equals(status)) {
                 return false;
             }
         }
@@ -75,24 +72,25 @@ public class BattleshipService {
     }
 
     private void putShipOnGrid(Ship ship, Grid grid) {
-        int x = ship.isHorizontal() ? ship.getRow() : ship.getColumn();
-        int y = ship.isHorizontal() ? ship.getColumn() : ship.getRow();
-        BiFunction<Integer, Integer, Location> getLocation = ship.isHorizontal() ?
-                grid::getLocation : (row, column) -> grid.getLocation(column, row);
-
-        //        reservePlaceForShip()
-        for (int constantCoordinate = x - 1; constantCoordinate <= x + 1; constantCoordinate++) {
-            for (int alongShipCoordinate = y - 1; alongShipCoordinate < y + ship.getType().length + 1; alongShipCoordinate++) {
+        // reservePlaceForShip
+        for (int constant = ship.getConstantCoordinate() - 1; constant <= ship.getConstantCoordinate() + 1; constant++) {
+            for (int along = ship.getVariableCoordinate() - 1;
+                 along < ship.getVariableCoordinate() + ship.getType().length + 1; along++) {
                 try {
-                    getLocation.apply(constantCoordinate, alongShipCoordinate).setType(LocationStatus.OCCUPIED);
+                    getLocationForShip(grid, ship).apply(constant, along).setStatus(LocationStatus.OCCUPIED);
                 } catch (ArrayIndexOutOfBoundsException ignored) {
                 }
             }
         }
-
-        for (int alongShipCoordinate = y; alongShipCoordinate < y + ship.getType().length; alongShipCoordinate++) {
-            getLocation.apply(x, alongShipCoordinate).setShip(ship);
+        // put ship on grid
+        for (int along = ship.getVariableCoordinate();
+             along < ship.getVariableCoordinate() + ship.getType().length; along++) {
+            getLocationForShip(grid, ship).apply(ship.getConstantCoordinate(), along).setShip(ship);
         }
+    }
+
+    private BiFunction<Integer, Integer, Location> getLocationForShip(Grid grid, Ship ship) {
+        return ship.isHorizontal() ? grid::getLocation : (row, column) -> grid.getLocation(column, row);
     }
 
     private void logGrid() {
@@ -101,9 +99,10 @@ public class BattleshipService {
             for (int column = 0; column < BattleshipSettings.GRID_COLUMNS; column++) {
                 Location location = repository.getGrid().getLocation(row, column);
                 if (location.getShip() == null) {
-                    rowString.append("| " + location.getType().abbrev + " ");
+                    rowString.append("| " + location.getStatus().abbrev + " ");
                 } else {
-                    String locationSign = location.getType() == LocationStatus.WRECK? LocationStatus.WRECK.abbrev : "S";
+                    String locationSign = location.getStatus() == LocationStatus.WRECK ? LocationStatus.WRECK.abbrev
+                            : "S";
                     rowString.append("| " + locationSign + " ");
                 }
             }
