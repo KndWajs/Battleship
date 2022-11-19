@@ -2,8 +2,8 @@ import React, {useEffect} from 'react';
 
 import './location.scss';
 import {getLocationStatusName, LocationStatus} from "../../shared/enums/LocationStatus";
-import {useAppSelector} from "../../app/hooks";
-import {selectGrid, selectStatus} from "./gridSlice";
+import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {selectGrid, selectLocation, selectStatus, setLocation, shot} from "./gridSlice";
 import {GameStatus} from "../../shared/enums/GameStatus";
 
 export function Grid() {
@@ -11,7 +11,12 @@ export function Grid() {
     const grid = useAppSelector(selectGrid);
     let status = useAppSelector(selectStatus);
 
-
+    const dispatch = useAppDispatch();
+    const hit = (row: number, column: number) => {
+        let location = "ABCDEFGHIJ".charAt(row) + (column + 1);
+        dispatch(setLocation(location))
+        dispatch(shot(location))
+    }
     return (
         <>
             {status == GameStatus.BEFORE ? null :
@@ -20,7 +25,7 @@ export function Grid() {
                     </div>
                     {[...Array(10)].map((x, i) =>
                         <div className="location header">
-                            <strong>{i+1}</strong>
+                            <strong>{i + 1}</strong>
                         </div>
                     )}
                     {grid.map((columns, row) =>
@@ -30,7 +35,8 @@ export function Grid() {
                             </div>
                             {
                                 columns.map((loc, column) =>
-                                    <div className="location">
+                                    <div className="location"
+                                         onClick={() =>hit(row, column)}>
                                         {getLocationStatusName(loc)}
                                     </div>
                                 )}
