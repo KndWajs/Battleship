@@ -3,6 +3,7 @@ import {RootState} from '../../app/store';
 import {LocationStatus} from "../../shared/enums/LocationStatus";
 import {shotCall, startNewGame} from "./gridAPI";
 import {GameStatus} from "../../shared/enums/GameStatus";
+import {ShotType} from "../../shared/enums/ShotType";
 
 export interface GridState {
     status: GameStatus,
@@ -38,6 +39,7 @@ export const startNewGameAction = createAsyncThunk(
     async () => {
         // The value we return becomes the `fulfilled` action payload
         let newVar = await startNewGame();
+        console.log("sng")
         return newVar;
     }
 );
@@ -66,9 +68,25 @@ export const gridSlice = createSlice({
                 state.status = GameStatus.LOADING;
             })
             .addCase(shot.fulfilled, (state, action) => {
-                state.grid[action.payload.row][action.payload.column] = action.payload.status;
+                let newStatus: LocationStatus;
+                switch (action.payload.data.shot) {
+                    case ShotType.HIT: {
+                        newStatus = LocationStatus.WRECK;
+                        break;
+                    }
+                    case ShotType.MISS: {
+                        newStatus = LocationStatus.MISS;
+                        break;
+                    }
+                    default: {
+                        newStatus = LocationStatus.WRECK;
+                        window.alert("Ship was completely destroyed!");
+                        break;
+                    }
+                }
+                state.grid[action.payload.data.row][action.payload.data.column] = newStatus;
             })
-            .addCase(shot.rejected, (state) => {
+            .addCase(shot.rejected, (state, action) => {
                 state.status = GameStatus.FAILED;
             })
             .addCase(startNewGameAction.pending, (state) => {
@@ -76,9 +94,11 @@ export const gridSlice = createSlice({
             })
             .addCase(startNewGameAction.fulfilled, (state, action) => {
                 state.grid = emptyGrid
+                console.log(action)
                 state.status = GameStatus.ONGOING;
             })
-            .addCase(startNewGameAction.rejected, (state) => {
+            .addCase(startNewGameAction.rejected, (state, action) => {
+                console.log(action)
                 state.status = GameStatus.FAILED;
             });
     },

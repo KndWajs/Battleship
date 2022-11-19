@@ -5,6 +5,9 @@ import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {selectGrid, selectLocation, selectStatus, setLocation, shot, startNewGameAction} from "../grid/gridSlice";
 import {Classes} from "@blueprintjs/core";
 import {GameStatus} from "../../shared/enums/GameStatus";
+import axios from "axios";
+import {createAsyncThunk} from "@reduxjs/toolkit";
+import {startNewGame} from "../grid/gridAPI";
 
 export function Counter() {
     const dispatch = useAppDispatch();
@@ -14,6 +17,7 @@ export function Counter() {
     const handleVoucherData = (e: React.FormEvent<HTMLInputElement>) => {
         dispatch(setLocation(e.currentTarget.value))
     }
+
     return (
         <div>
             <div className={styles.row}>

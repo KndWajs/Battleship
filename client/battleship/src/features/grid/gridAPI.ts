@@ -1,16 +1,13 @@
 // A mock function to mimic making an async request for data
 import {LocationStatus} from "../../shared/enums/LocationStatus";
+import axios, * as others from 'axios';
+import Response from "../../shared/response";
 
-export function shotCall(coordinates: string) {
-    return new Promise<{ status: LocationStatus,  row: number, column: number }>((resolve) =>
-        setTimeout(() => resolve({status: LocationStatus.WRECK, row: 3,
-            column: 5}), 500)
-    );
+export function shotCall(coordinates: string) : Promise<{data: Response}>{
+    return axios.put('/api/shot?coordinates=' + coordinates);
 }
 
 export function startNewGame() {
-    return new Promise<void>((resolve) =>
-        setTimeout(() => resolve(), 500)
-    );
+    return axios.post('/api/start');
 }
 
