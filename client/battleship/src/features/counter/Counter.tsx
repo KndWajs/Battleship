@@ -1,68 +1,47 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 
-import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import {
-  decrement,
-  increment,
-  incrementByAmount,
-  incrementAsync,
-  incrementIfOdd,
-  selectCount,
-} from './counterSlice';
 import styles from './Counter.module.css';
+import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {selectGrid, selectLocation, selectStatus, setLocation, shot, startNewGameAction} from "../grid/gridSlice";
+import {Classes} from "@blueprintjs/core";
+import {GameStatus} from "../../shared/enums/GameStatus";
 
 export function Counter() {
-  const count = useAppSelector(selectCount);
-  const dispatch = useAppDispatch();
-  const [incrementAmount, setIncrementAmount] = useState('2');
+    const dispatch = useAppDispatch();
+    let status = useAppSelector(selectStatus);
+    let location = useAppSelector(selectLocation);
 
-  const incrementValue = Number(incrementAmount) || 0;
+    const handleVoucherData = (e: React.FormEvent<HTMLInputElement>) => {
+        dispatch(setLocation(e.currentTarget.value))
+    }
+    return (
+        <div>
+            <div className={styles.row}>
+                {status == GameStatus.BEFORE ? null : <><input
+                    id="code"
+                    // value={voucherCode || ""}
+                    className={Classes.INPUT}
+                    placeholder={"A5"}
+                    onChange={handleVoucherData}
+                />
 
-  return (
-    <div>
-      <div className={styles.row}>
-        <button
-          className={styles.button}
-          aria-label="Decrement value"
-          onClick={() => dispatch(decrement())}
-        >
-          -
-        </button>
-        <span className={styles.value}>{count}</span>
-        <button
-          className={styles.button}
-          aria-label="Increment value"
-          onClick={() => dispatch(increment())}
-        >
-          +
-        </button>
-      </div>
-      <div className={styles.row}>
-        <input
-          className={styles.textbox}
-          aria-label="Set increment amount"
-          value={incrementAmount}
-          onChange={(e) => setIncrementAmount(e.target.value)}
-        />
-        <button
-          className={styles.button}
-          onClick={() => dispatch(incrementByAmount(incrementValue))}
-        >
-          Add Amount
-        </button>
-        <button
-          className={styles.asyncButton}
-          onClick={() => dispatch(incrementAsync(incrementValue))}
-        >
-          Add Async
-        </button>
-        <button
-          className={styles.button}
-          onClick={() => dispatch(incrementIfOdd(incrementValue))}
-        >
-          Add If Odd
-        </button>
-      </div>
-    </div>
-  );
+                    <button
+                        className={styles.button}
+                        onClick={() => dispatch(shot(location))}
+                    >
+                        Hit!
+                    </button>
+                </>}
+            </div>
+            <div className={styles.row}>
+
+                <button
+                    className={styles.button}
+                    onClick={() => dispatch(startNewGameAction())}
+                >
+                    {status == GameStatus.BEFORE ? 'Start New Game' : 'Restart Game'}
+                </button>
+            </div>
+        </div>
+    );
 }
