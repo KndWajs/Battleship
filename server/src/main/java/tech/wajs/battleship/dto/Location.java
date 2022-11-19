@@ -4,14 +4,18 @@
 
 package tech.wajs.battleship.dto;
 
+import lombok.Getter;
+import lombok.Setter;
 import tech.wajs.battleship.enums.LocationType;
 
+@Getter
 public class Location {
-
     private int row;
     private int column;
-    private boolean isShipHorizontal; // todo maybe move to Ship
+    private boolean isShipHorizontal;
+    @Setter
     private Ship ship;
+    @Setter
     private LocationType type;
 
     public Location() {

@@ -4,8 +4,10 @@
 
 package tech.wajs.battleship.dto;
 
+import lombok.Getter;
 import tech.wajs.battleship.enums.ShipType;
 
+@Getter
 public class Ship {
     private ShipType type;
     private Integer hits;
