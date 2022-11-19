@@ -20,6 +20,7 @@ public class Ship {
         this.row = row;
         this.column = column;
         this.horizontal = horizontal;
+        this.hits = 0;
     }
 
     public int getConstantCoordinate(){
@@ -27,5 +28,9 @@ public class Ship {
     }
     public int getVariableCoordinate(){
         return horizontal ? column : row;
+    }
+
+    public void hit() {
+        hits++;
     }
 }

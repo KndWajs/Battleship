@@ -7,6 +7,7 @@ package tech.wajs.battleship.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import tech.wajs.battleship.BattleshipSettings;
 import tech.wajs.battleship.dto.Grid;
 import tech.wajs.battleship.dto.Location;
@@ -14,8 +15,10 @@ import tech.wajs.battleship.dto.ResponseDTO;
 import tech.wajs.battleship.dto.Ship;
 import tech.wajs.battleship.enums.LocationStatus;
 import tech.wajs.battleship.enums.ShipType;
+import tech.wajs.battleship.enums.ShotType;
 import tech.wajs.battleship.repository.GridRepository;
 
+import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.function.BiFunction;
 
@@ -25,6 +28,7 @@ import java.util.function.BiFunction;
 public class BattleshipService {
 
     private GridRepository repository;
+    private LocationService locationService;
 
     public void start() { //TODO test it as a reset too
         Grid grid = repository.createNewGrid();
@@ -33,10 +37,6 @@ public class BattleshipService {
             placeShip(grid, ship);
         }
         logGrid();
-    }
-
-    public ResponseDTO shot(String coordinates) {
-        return null;
     }
 
     private void placeShip(Grid grid, ShipType shipType) {
@@ -108,6 +108,45 @@ public class BattleshipService {
             }
             rowString.append("|");
             log.info(rowString.toString());
+        }
+    }
+
+    public ResponseDTO shot(String coordinates) {
+        inputValidation(coordinates);
+        //TODO input validation
+        int row = BattleshipSettings.ROWS.indexOf(getX(coordinates));
+        int column = getY(coordinates) - 1;
+        ShotType shot = locationService.hit(repository.getGrid().getLocation(row, column));
+        logGrid();
+
+        return new ResponseDTO(shot, row, column);
+    }
+
+    private void inputValidation(String coordinates) {
+        if (!StringUtils.hasText(coordinates) || coordinates.length() > 3) {
+            throw new InputMismatchException("WrongInput!");
+        }
+    }
+
+    private Character getX(String coordinates) {
+        Character character = Character.toUpperCase(coordinates.charAt(0));
+        if (!BattleshipSettings.ROWS.contains(character)) {
+            throw new InputMismatchException("CharacterOutOfGrid!");
+        }
+        return character;
+    }
+
+    private int getY(String coordinates) {
+        String substring = coordinates.substring(1);
+
+        try {
+            int integer = Integer.parseInt(substring);
+            if (integer > BattleshipSettings.GRID_COLUMNS) {
+                throw new InputMismatchException("NumberOutOfGrid!");
+            }
+            return integer;
+        } catch (NumberFormatException e) {
+            throw new InputMismatchException("CanNotParseToNumber!");
         }
     }
 }
