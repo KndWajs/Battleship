@@ -4,7 +4,7 @@
 
 package tech.wajs.battleship.enums;
 
-public enum LocationType {
+public enum LocationStatus {
     WRECK("W"),
     OCCUPIED("O"),
     MISS("M"),
@@ -12,7 +12,7 @@ public enum LocationType {
 
     public String abbrev;
 
-    LocationType(String abbrev) {
+    LocationStatus(String abbrev) {
         this.abbrev = abbrev;
     }
 }
