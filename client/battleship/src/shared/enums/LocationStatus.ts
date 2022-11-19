@@ -9,9 +9,9 @@ export interface LocationType {
 }
 
 export const LocationStatusProperties = new Map<LocationStatus, LocationType>([
-    [LocationStatus.WRECK, {abbrev: "W"}],
-    [LocationStatus.MISS, {abbrev: "M"}],
-    [LocationStatus.EMPTY, {abbrev: "E"}],
+    [LocationStatus.WRECK, {abbrev: "O"}],
+    [LocationStatus.MISS, {abbrev: "X"}],
+    [LocationStatus.EMPTY, {abbrev: ""}],
 ])
 
 export const getLocationStatusName = (locationStatus: LocationStatus): string | undefined =>

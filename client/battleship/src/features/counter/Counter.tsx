@@ -23,7 +23,7 @@ export function Counter() {
             <div className={styles.row}>
                 {status == GameStatus.BEFORE ? null : <><input
                     id="code"
-                    // value={voucherCode || ""}
+                    value={location}
                     className={Classes.INPUT}
                     placeholder={"A5"}
                     onChange={handleVoucherData}

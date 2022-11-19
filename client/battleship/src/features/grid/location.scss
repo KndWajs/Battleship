@@ -6,10 +6,15 @@
 }
 
 .location {
-  flex: 1 0 9%; /* explanation below */
+  flex: 1 0 8%; /* explanation below */
   margin: 1px;
-  height: 30px;
+  height: 25px;
   background-color: aqua;
+  font-size:20px;
+}
+
+.header {
+  background-color: aliceblue !important;
 }
 
 

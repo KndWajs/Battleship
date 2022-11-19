@@ -95,6 +95,7 @@ public class BattleshipService {
     }
 
     private void logGrid() {
+        log.info("Print grid:");
         for (int row = 0; row < BattleshipSettings.GRID_ROWS; row++) {
             StringBuilder rowString = new StringBuilder();
             for (int column = 0; column < BattleshipSettings.GRID_COLUMNS; column++) {

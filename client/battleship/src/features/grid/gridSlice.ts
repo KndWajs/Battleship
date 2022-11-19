@@ -4,6 +4,7 @@ import {LocationStatus} from "../../shared/enums/LocationStatus";
 import {shotCall, startNewGame} from "./gridAPI";
 import {GameStatus} from "../../shared/enums/GameStatus";
 import {ShotType} from "../../shared/enums/ShotType";
+import Response from "../../shared/response";
 
 export interface GridState {
     status: GameStatus,
@@ -16,7 +17,7 @@ const emptyGrid: LocationStatus[][] = Array(10).fill(Array(10).fill(LocationStat
 const initialState: GridState = {
     status: GameStatus.BEFORE,
     grid: emptyGrid,
-    location: ""
+    location: "D5"
 };
 
 // The function below is called a thunk and allows us to perform async logic. It
@@ -27,19 +28,21 @@ const initialState: GridState = {
 // @ts-ignore
 export const shot = createAsyncThunk(
     'grid/shot',
-    async (coordinates: string) => {
-        // The value we return becomes the `fulfilled` action payload
-        let newVar = await shotCall(coordinates);
-        return newVar;
+    async (coordinates: string, {rejectWithValue}) => {
+        try {
+            let newVar = await shotCall(coordinates);
+            return newVar;
+        } catch (err) {
+            // @ts-ignore
+            return rejectWithValue(err.response.data[0]);
+        }
     }
 );
 
 export const startNewGameAction = createAsyncThunk(
     'grid/start-new-game',
     async () => {
-        // The value we return becomes the `fulfilled` action payload
         let newVar = await startNewGame();
-        console.log("sng")
         return newVar;
     }
 );
@@ -69,7 +72,8 @@ export const gridSlice = createSlice({
             })
             .addCase(shot.fulfilled, (state, action) => {
                 let newStatus: LocationStatus;
-                switch (action.payload.data.shot) {
+                let payload = action.payload.data as Response;
+                switch (payload.shot) {
                     case ShotType.HIT: {
                         newStatus = LocationStatus.WRECK;
                         break;
@@ -84,9 +88,11 @@ export const gridSlice = createSlice({
                         break;
                     }
                 }
-                state.grid[action.payload.data.row][action.payload.data.column] = newStatus;
+                state.grid[payload.row][payload.column] = newStatus;
             })
             .addCase(shot.rejected, (state, action) => {
+                // @ts-ignore
+                window.alert(action.payload);
                 state.status = GameStatus.FAILED;
             })
             .addCase(startNewGameAction.pending, (state) => {
@@ -98,7 +104,8 @@ export const gridSlice = createSlice({
                 state.status = GameStatus.ONGOING;
             })
             .addCase(startNewGameAction.rejected, (state, action) => {
-                console.log(action)
+                // @ts-ignore
+                window.alert(action.payload);
                 state.status = GameStatus.FAILED;
             });
     },
