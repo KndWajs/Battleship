@@ -4,8 +4,15 @@
 
 package tech.wajs.battleship.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+import tech.wajs.battleship.BattleshipSettings;
+
 public class Grid {
     private final Location[][] grid;
+    @Getter
+    @Setter
+    private Integer ships;
 
     public Grid(int rows, int columns) {
         grid = new Location[rows][columns];
@@ -14,6 +21,7 @@ public class Grid {
                 grid[j][i] = new Location();
             }
         }
+        ships = BattleshipSettings.SHIPS.size();
     }
 
     public Location getLocation(int row, int column) {

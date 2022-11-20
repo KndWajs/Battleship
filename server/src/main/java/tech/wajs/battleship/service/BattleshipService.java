@@ -119,9 +119,16 @@ public class BattleshipService {
         int row = BattleshipSettings.ROWS.indexOf(getX(coordinates));
         int column = getY(coordinates) - 1;
         ShotType shot = locationService.hit(repository.getGrid().getLocation(row, column));
+
+        Grid grid = repository.getGrid();
+
+        if (shot.equals(ShotType.SINK)) {
+            grid.setShips(grid.getShips() - 1);
+        }
+
         logGrid();
 
-        return new ResponseDTO(shot, row, column);
+        return new ResponseDTO(grid.getShips() == 0 ? ShotType.END : shot, row, column);
     }
 
     private void inputValidation(String coordinates) {

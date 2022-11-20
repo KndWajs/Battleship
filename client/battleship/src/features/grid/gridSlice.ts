@@ -82,10 +82,20 @@ export const gridSlice = createSlice({
                         newStatus = LocationStatus.MISS;
                         break;
                     }
-                    default: {
+                    case ShotType.SINK: {
                         newStatus = LocationStatus.WRECK;
                         window.alert("Ship was completely destroyed!");
                         break;
+                    }
+                    case ShotType.END: {
+                        newStatus = LocationStatus.WRECK;
+                        state.status = GameStatus.BEFORE;
+                        window.alert("You WIN!");
+                        break;
+                    }
+                    default: {
+                        newStatus = state.grid[payload.row][payload.column];
+                        window.alert("Something went wrong...");
                     }
                 }
                 state.grid[payload.row][payload.column] = newStatus;

@@ -7,5 +7,6 @@ package tech.wajs.battleship.enums;
 public enum ShotType {
     HIT,
     MISS,
-    SINK;
+    SINK,
+    END;
 }
