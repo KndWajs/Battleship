@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import tech.wajs.battleship.dto.Location;
 import tech.wajs.battleship.enums.LocationStatus;
 import tech.wajs.battleship.enums.ShotType;
+import tech.wajs.battleship.exceptions.ErrorMessages;
 import tech.wajs.battleship.exceptions.KnownException;
 
 @Service
@@ -20,7 +21,7 @@ public class LocationService {
 
     public ShotType hit(Location location) {
         if (location.getStatus().equals(LocationStatus.MISS) || location.getStatus().equals(LocationStatus.WRECK)) {
-            throw new KnownException("Don't waste bullets!", HttpStatus.NOT_ACCEPTABLE);
+            throw new KnownException(ErrorMessages.SENSELESS_SHOT.description, HttpStatus.NOT_ACCEPTABLE);
         }
         if (location.getShip() != null) {
             location.setStatus(LocationStatus.WRECK);

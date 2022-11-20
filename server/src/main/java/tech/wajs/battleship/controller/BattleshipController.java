@@ -18,10 +18,12 @@ import tech.wajs.battleship.service.BattleshipService;
 @AllArgsConstructor
 public class BattleshipController {
     private BattleshipService battleshipService;
+
     @PostMapping(value = "/start")
     public void shot() {
         battleshipService.start();
     }
+
     @PutMapping(value = "/shot")
     public ResponseDTO shot(@RequestParam String coordinates) {
         return battleshipService.shot(coordinates);

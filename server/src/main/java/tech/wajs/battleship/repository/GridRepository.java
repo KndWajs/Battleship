@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import tech.wajs.battleship.BattleshipSettings;
 import tech.wajs.battleship.dto.Grid;
+import tech.wajs.battleship.exceptions.ErrorMessages;
 import tech.wajs.battleship.exceptions.KnownException;
 
 @Repository
@@ -17,7 +18,7 @@ public class GridRepository {
 
     public Grid getGrid() {
         if(grid==null){
-            throw new KnownException("The game has not started yet!", HttpStatus.NOT_ACCEPTABLE);
+            throw new KnownException(ErrorMessages.NOT_STARTED.description, HttpStatus.NOT_ACCEPTABLE);
         }
         return grid;
     }

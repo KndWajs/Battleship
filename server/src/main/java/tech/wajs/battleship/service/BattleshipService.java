@@ -17,6 +17,7 @@ import tech.wajs.battleship.dto.Ship;
 import tech.wajs.battleship.enums.LocationStatus;
 import tech.wajs.battleship.enums.ShipType;
 import tech.wajs.battleship.enums.ShotType;
+import tech.wajs.battleship.exceptions.ErrorMessages;
 import tech.wajs.battleship.exceptions.KnownException;
 import tech.wajs.battleship.repository.GridRepository;
 
@@ -31,7 +32,7 @@ public class BattleshipService {
     private GridRepository repository;
     private LocationService locationService;
 
-    public void start() { //TODO test it as a reset too
+    public void start() {
         Grid grid = repository.createNewGrid();
 
         for (ShipType ship : BattleshipSettings.SHIPS) {
@@ -115,7 +116,6 @@ public class BattleshipService {
 
     public ResponseDTO shot(String coordinates) {
         inputValidation(coordinates);
-        //TODO input validation
         int row = BattleshipSettings.ROWS.indexOf(getX(coordinates));
         int column = getY(coordinates) - 1;
         ShotType shot = locationService.hit(repository.getGrid().getLocation(row, column));
@@ -126,14 +126,14 @@ public class BattleshipService {
 
     private void inputValidation(String coordinates) {
         if (!StringUtils.hasText(coordinates) || coordinates.length() > 3) {
-            throw new KnownException("Wrong Input, only: [char from A-J][number 1-10]!", HttpStatus.NOT_ACCEPTABLE);
+            throw new KnownException(ErrorMessages.WRONG_INPUT.description, HttpStatus.NOT_ACCEPTABLE);
         }
     }
 
     private Character getX(String coordinates) {
         Character character = Character.toUpperCase(coordinates.charAt(0));
         if (!BattleshipSettings.ROWS.contains(character)) {
-            throw new KnownException(String.format("Character %s is out of grid!", character),
+            throw new KnownException(String.format(ErrorMessages.CHAR_OUT_OF_GRID.description, character),
                     HttpStatus.NOT_ACCEPTABLE);
         }
         return character;
@@ -145,12 +145,12 @@ public class BattleshipService {
         try {
             int integer = Integer.parseInt(substring);
             if (integer > BattleshipSettings.GRID_COLUMNS || integer <= 0) {
-                throw new KnownException(String.format("Number %s is out of grid!", integer),
+                throw new KnownException(String.format(ErrorMessages.NUMBER_OUT_OF_GRID.description, integer),
                         HttpStatus.NOT_ACCEPTABLE);
             }
             return integer;
         } catch (NumberFormatException e) {
-            throw new KnownException(String.format("Text %s can not parse to number!", substring),
+            throw new KnownException(String.format(ErrorMessages.NUMBER_NOT_PARSABLE.description, substring),
                     HttpStatus.NOT_ACCEPTABLE);
         }
     }
